@@ -18,31 +18,31 @@ import { logger } from '../utils/logger'
 //C: Check if result meets specified constraints
 export const checkConstraints = (result: number, constraints: IConstraints): boolean => {
   logger.info('CONSTRAINTS', 'Перевірка обмежень для:', result)
-  
+
   //C: Перевірка максимального допустимого результату
   //C: Check maximum allowed result
   if (constraints.maxResult !== undefined && result > constraints.maxResult) {
     return false
   }
-  
+
   //C: Перевірка мінімального допустимого результату
   //C: Check minimum allowed result
   if (constraints.minResult !== undefined && result < constraints.minResult) {
     return false
   }
-  
+
   //C: Перевірка вимоги цілочисельного результату
   //C: Check integer result requirement
   if (constraints.integerResult && !Number.isInteger(result)) {
     return false
   }
-  
+
   //C: Перевірка дозволу від'ємних значень
   //C: Check allowance of negative values
   if (!constraints.canBeNegative && result < 0) {
     return false
   }
-  
+
   logger.info('CONSTRAINTS', 'Усі обмеження пройдені')
   return true
 }
@@ -53,26 +53,26 @@ export const hasEqualNumeratorDenominator = (variables: Record<string, number>):
   //C: Список операцій з дробами для перевірки
   //C: List of fraction operations to check
   const fractionOperations = ['fraction', 'fractionAdd', 'fractionSubtract', 'fractionMultiply', 'fractionDivide']
-  
+
   //C: Перевірка чи є у змінних операції з дробами
   //C: Check if variables contain fraction operations
-  const hasFractionOperations = Object.keys(variables).some(key => 
+  const hasFractionOperations = Object.keys(variables).some(key =>
     fractionOperations.some(op => key.toLowerCase().includes(op))
   )
-  
+
   //C: Якщо операцій з дробами немає - перевірка не потрібна
   //C: If no fraction operations exist - no need to check
   if (!hasFractionOperations) {
     return false
   }
-  
+
   //C: Можливі пари змінних для чисельника та знаменника
   //C: Possible variable pairs for numerator and denominator
   const possiblePairs = [
     ['A', 'B'], ['A', 'D'], ['C', 'B'], ['C', 'D'],
     ['numerator', 'denominator'], ['num', 'denom']
   ]
-  
+
   //C: Перевірка кожної пари на рівність значень
   //C: Check each pair for value equality
   for (const [numVar, denomVar] of possiblePairs) {
@@ -82,6 +82,6 @@ export const hasEqualNumeratorDenominator = (variables: Record<string, number>):
       }
     }
   }
-  
+
   return false
 }

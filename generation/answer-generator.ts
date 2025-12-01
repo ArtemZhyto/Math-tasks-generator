@@ -16,6 +16,7 @@ import MathFunctions from '../evaluation/math-functions'
 import { parseFraction } from '../utils/fraction-utils'
 import { logger } from '../utils/logger'
 import { MEASUREMENT_UNITS } from '../constants'
+import { formatDecimal } from '../utils/number-utils'
 
 //C: Генерація варіантів відповідей для тестових завдань
 //C: Generate answer options for test tasks
@@ -81,13 +82,14 @@ const generateWrongAnswer = (
 const generateWrongAnswerWithUnits = (correctAnswer: string, constraints: IConstraints): string => {
   logger.info('WRONG_UNITS', 'Генерація неправильної відповіді з одиниицями для:', correctAnswer)
   
-  const parts = correctAnswer.split(' ')
-  if (parts.length < 2) {
-    return generateStringWrongAnswer(correctAnswer, constraints)
-  }
+  //C: Видалення пробілів для парсингу числа, але збереження одиниць виміру
+  //C: Remove spaces for number parsing but preserve measurement units
+  const numericPartWithSpaces = correctAnswer.split(' ')[0]
+  const units = correctAnswer.slice(numericPartWithSpaces.length).trim()
   
-  const numericPart = parts[0]
-  const units = parts.slice(1).join(' ')
+  //C: Видаляємо пробіли для конвертації в число
+  //C: Remove spaces for conversion to number
+  const numericPart = numericPartWithSpaces.replace(/\s/g, '')
   const numericValue = Number(numericPart.replace(',', '.'))
   
   if (isNaN(numericValue)) {
@@ -95,7 +97,8 @@ const generateWrongAnswerWithUnits = (correctAnswer: string, constraints: IConst
   }
   
   const wrongNumeric = generateWrongNumericValue(numericValue, constraints, 20)
-  const formattedWrongAnswer = formatNumericValue(wrongNumeric, constraints.integerResult)
+  const roundedWrongNumeric = Math.round(wrongNumeric * 100) / 100
+  const formattedWrongAnswer = formatDecimal(roundedWrongNumeric.toString(), true)
   
   return `${formattedWrongAnswer} ${units}`
 }
@@ -191,7 +194,11 @@ const generateStringWrongAnswer = (correctAnswer: string, constraints: IConstrai
     return generateFractionWrongAnswer(correctAnswer, constraints)
   }
   
-  const numericAnswer = Number(correctAnswer.replace(',', '.'))
+  //C: Спроба інтерпретувати як число (з видаленням пробілів)
+  //C: Attempt to interpret as number (with spaces removed)
+  const numericString = correctAnswer.replace(/\s/g, '')
+  const numericAnswer = Number(numericString.replace(',', '.'))
+  
   if (!isNaN(numericAnswer)) {
     return generateNumericWrongAnswer(numericAnswer, constraints)
   }
@@ -331,14 +338,64 @@ const hasMeasurementUnits = (answer: string): boolean => {
   return MEASUREMENT_UNITS.some(unit => answer.includes(unit))
 }
 
-//C: Форматування числового значення з урахуванням обмежень
-//C: Format numeric value considering constraints
+//C: Форматування числового значення з урахуванням обмежень та розділенням тисяч
+//C: Format numeric value considering constraints and thousand separators
 const formatNumericValue = (value: number, integerResult?: boolean): string => {
   if (integerResult) {
     value = Math.round(value)
   }
   
-  return Number.isInteger(value) 
-    ? value.toString() 
-    : value.toString().replace('.', ',')
+  //C: Додавання знаку мінус для від'ємних чисел
+  //C: Add minus sign for negative numbers
+  const sign = value < 0 ? '-' : ''
+  const absoluteValue = Math.abs(value)
+  
+  let formattedValue: string
+  
+  if (Number.isInteger(absoluteValue)) {
+    //C: Цілі числа - используем улучшенную функцию
+    //C: Integers - use improved function
+    formattedValue = formatNumberWithSpaces(absoluteValue)
+  } else {
+    //C: Дробові числа
+    //C: Decimal numbers
+    const [integerPart, decimalPart] = absoluteValue.toString().split('.')
+    const formattedInteger = formatNumberWithSpaces(Number(integerPart))
+    formattedValue = `${formattedInteger},${decimalPart}`
+  }
+  
+  return sign + formattedValue
+}
+
+//C: Розділення тисяч (только для целой части)
+//C: Thousand separators (only for integer part)
+const formatNumberWithSpaces = (num: number): string => {
+  const numStr = num.toString()
+  
+  //C: Разделяем целую и десятичную части
+  //C: Separate integer and decimal parts
+  const [integerPart, decimalPart] = numStr.split('.')
+  
+  //C: Форматируем только целую часть с пробелами
+  //C: Format only integer part with spaces
+  const absoluteValue = Math.abs(Number(integerPart)).toString()
+  const cleanValue = absoluteValue.replace(/^0+/, '') || '0'
+  
+  const formattedInteger = cleanValue
+    .split('')
+    .reverse()
+    .join('')
+    .match(/.{1,3}/g)
+    ?.join(' ')
+    .split('')
+    .reverse()
+    .join('') || cleanValue
+  
+  const sign = num < 0 ? '-' : ''
+  
+  //C: Возвращаем с десятичной частью (без пробелов)
+  //C: Return with decimal part (without spaces)
+  return decimalPart 
+    ? `${sign}${formattedInteger},${decimalPart}`
+    : `${sign}${formattedInteger}`
 }

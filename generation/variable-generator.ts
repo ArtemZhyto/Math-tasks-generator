@@ -29,31 +29,36 @@ export const generateVariables = (
   let attempts = 0
   const MAX_ATTEMPTS = 100
   
+  //C: Якщо шаблон містить строкові функції, пропускаємо перевірку цілочисельності
+  //C: If template contains string functions, skip integer check
+  const hasStringFunctions = /greater|less|equal|compare|isPrime/.test(template)
+  
   do {
     logger.info(`VARIABLES`, `Спроба ${attempts + 1}`)
     
     //C: Генерація значень для кожної змінної з конфігурації
-    //C: Generate values for each variable from configuration
     Object.entries(variablesConfig).forEach(([varName, config]) => {
       variables[varName] = generateVariableValue(config)
     })
     
     attempts++
 
-    //C: Перевірка максимальної кількості спроб генерації
-    //C: Check maximum generation attempts limit
     if (attempts >= MAX_ATTEMPTS) {
       throw new Error('Не вдається згенерувати змінні за 100 спроб')
     }
 
+    //C: Пропускаємо перевірку цілочисельності для строкових функцій
+    if (hasStringFunctions) {
+      logger.info('VARIABLES', 'Пропуск перевірки цілочисельності для строкових функцій')
+      break
+    }
+
     //C: Перевірка цілочисельності результату якщо потрібно
-    //C: Check integer result if required
     if (constraints.integerResult && !checkIntegerResult(template, variables)) {
       continue
     }
 
     //C: Перевірка що чисельник не дорівнює знаменнику у дробах
-    //C: Check that numerator doesn't equal denominator in fractions
     if (!hasEqualNumeratorDenominator(variables)) {
       logger.info('VARIABLES', 'Усі перевірки пройдені')
       break
@@ -103,20 +108,40 @@ const generateVariableValue = (config: IVariableConfig): number => {
 const checkIntegerResult = (template: string, variables: Record<string, number>): boolean => {
   logger.info('VARIABLES', 'Перевірка цілочисленості результату')
   
+  //C: Якщо шаблон містить строкові функції, повністю пропускаємо перевірку
+  //C: If template contains string functions, completely skip check
+  const hasStringFunctions = /greater|less|equal|compare|isPrime/.test(template)
+  if (hasStringFunctions) {
+    logger.info('VARIABLES', 'Повний пропуск: шаблон містить строкові функції')
+    return true
+  }
+  
   try {
     //C: Обчислення числової частини виразу для перевірки
     //C: Calculate numeric part of expression for verification
-    const numericResult = evaluateNumericPart(template, variables)
+    const result = evaluateNumericPart(template, variables)
     
-    if (!Number.isInteger(numericResult)) {
+    //C: Якщо результат - рядок, пропускаємо перевірку (це строковий результат)
+    //C: If result is string, skip check (it's string result)
+    if (typeof result === 'string') {
+      logger.info('VARIABLES', 'Пропуск: строковий результат')
+      return true
+    }
+    
+    //C: Перевірка чисельного результату
+    //C: Check numeric result
+    if (!Number.isInteger(result)) {
       logger.info('VARIABLES', 'Пропуск: числова частина не ціле число')
       return false
     }
     
     logger.info('VARIABLES', 'Числова частина - ціле число')
     return true
+    
   } catch (error) {
-    logger.info('VARIABLES', 'Помилка перевірки числовой частини:', error)
-    return false
+    //C: При помилці обчислення приймаємо результат (ймовірно строковий)
+    //C: On calculation error accept result (probably string)
+    logger.info('VARIABLES', 'Помилка перевірки числовой частини, приймаємо:', error)
+    return true
   }
 }

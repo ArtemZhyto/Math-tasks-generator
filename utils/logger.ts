@@ -1,6 +1,6 @@
 //C: Флаг відладки для контролю логування
 //C: Debug flag for logging control
-const DEBUG = true
+const DEBUG = false
 
 //C: Об'єкт логера для структурованого виводу інформації
 //C: Logger object for structured information output
@@ -12,7 +12,7 @@ export const logger = {
       console.log(`📝 [${context}] ${message}`, ...args)
     }
   },
-  
+
   //C: Логування попереджень
   //C: Log warnings
   warn: (context: string, message: string, ...args: any[]) => {
@@ -20,7 +20,7 @@ export const logger = {
       console.warn(`⚠️ [${context}] ${message}`, ...args)
     }
   },
-  
+
   //C: Логування помилок
   //C: Log errors
   error: (context: string, message: string, ...args: any[]) => {

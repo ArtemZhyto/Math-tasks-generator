@@ -10,11 +10,14 @@
 
 
 
+//@ Modules
+import { logger } from '../utils/logger'
+
 //C: Список всіх доступних математичних функцій для генератора
 //C: List of all available mathematical functions for generator
 export const ALL_FUNCTIONS = [
   'sum', 'multiply', 'minus', 'divide', 'modulus', 'isPrime',
-  'pow', 'sqrt', 'root', 'greater', 'less', 'equal', 'compare', 
+  'pow', 'sqrt', 'root', 'greater', 'less', 'equal', 'compare',
   'max', 'min', 'fraction', 'fractionAdd', 'fractionSubtract',
   'fractionMultiply', 'fractionDivide', 'numerator', 'denominator',
   'gcd', 'lcm', 'toDecimal', 'toFraction', 'round', 'concat'
@@ -29,7 +32,7 @@ const MathFunctions = {
 	multiply: (a: number, b: number): number => a * b,
   minus: (a: number, b: number): number => a - b,
   divide: (a: number, b: number): number => a / b,
-  
+
   //C: Операція модуля з перевіркою ділення на нуль
   //C: Modulus operation with division by zero check
   modulus: (a: number, b: number): number => {
@@ -42,11 +45,26 @@ const MathFunctions = {
   //C: Конкатенація аргументів у рядок
   //C: Concatenate arguments into string
 	concat: (...args: any[]): string => {
-    console.log('🔤 [CONCAT] Вызов concat с аргументами:', args)
-    const result = args.join('')
-    console.log('🔤 [CONCAT] Результат:', result)
-    return result
-  },
+		logger.info('CONCAT', 'Виклик concat з аргументами: ', args)
+
+		//C: Обробка аргументів - видалення лапок з строкових літералів
+		//C: Process arguments - remove quotes from string literals
+		const processedArgs = args.map(arg => {
+			if (typeof arg === 'string') {
+				//C: Видаляємо зовнішні лапки якщо вони є
+				//C: Remove outer quotes if they exist
+				if ((arg.startsWith("'") && arg.endsWith("'")) ||
+						(arg.startsWith('"') && arg.endsWith('"'))) {
+					return arg.slice(1, -1)
+				}
+			}
+			return arg
+		})
+
+		const result = processedArgs.join('')
+		logger.info('CONCAT', 'Результат: ', result)
+		return result
+	},
 
   //C: Математичні функції піднесення до степеня та коренів
   //C: Mathematical functions for exponentiation and roots
@@ -56,7 +74,7 @@ const MathFunctions = {
 
   //C: Округлення чисел з заданою точністю
   //C: Round numbers with specified precision
-	round: (a: number, precision: number = 1): number => {
+	round: (a: number, precision: number = 100): number => {
 		if (precision === 1) {
 			return Math.round(a)
 		}
@@ -85,7 +103,7 @@ const MathFunctions = {
     if (n < 2) return ifFalse
     if (n === 2) return ifTrue
     if (n % 2 === 0) return ifFalse
-    
+
     for (let i = 3; i <= Math.sqrt(n); i += 2) {
       if (n % i === 0) return ifFalse
     }
@@ -97,7 +115,7 @@ const MathFunctions = {
 	fraction: (numerator: number, denominator: number): string => {
 		return MathFunctions.simplifyFraction(numerator, denominator)
 	},
-	
+
   //C: Конвертація дробу у десяткове число
   //C: Convert fraction to decimal number
 	toDecimal: (fraction: string): number => {
@@ -147,15 +165,15 @@ const MathFunctions = {
   //C: Add fractions by finding common denominator
   fractionAdd: (...args: any[]): string => {
     const fractions = args as string[]
-    
+
     const parsedFractions = fractions.map(f => parseFraction(f))
     let commonDenominator = parsedFractions.reduce((lcm, f) => MathFunctions.lcm(lcm, f.denominator), 1)
-    
+
     let sumNumerator = 0
     parsedFractions.forEach(f => {
       sumNumerator += f.numerator * (commonDenominator / f.denominator)
     })
-    
+
     return MathFunctions.simplifyFraction(sumNumerator, commonDenominator)
   },
 
@@ -163,14 +181,14 @@ const MathFunctions = {
   //C: Subtract fractions
   fractionSubtract: (...args: any[]): string => {
     const [f1, f2] = args as string[]
-    
+
     const frac1 = parseFraction(f1)
     const frac2 = parseFraction(f2)
     const commonDenominator = MathFunctions.lcm(frac1.denominator, frac2.denominator)
-    
+
     const numerator1 = frac1.numerator * (commonDenominator / frac1.denominator)
     const numerator2 = frac2.numerator * (commonDenominator / frac2.denominator)
-    
+
     return MathFunctions.simplifyFraction(numerator1 - numerator2, commonDenominator)
   },
 
@@ -178,11 +196,11 @@ const MathFunctions = {
   //C: Multiply fractions
   fractionMultiply: (...args: any[]): string => {
     const fractions = args as string[]
-    
+
     const parsedFractions = fractions.map(f => parseFraction(f))
     let numerator = parsedFractions.reduce((acc, f) => acc * f.numerator, 1)
     let denominator = parsedFractions.reduce((acc, f) => acc * f.denominator, 1)
-    
+
     return MathFunctions.simplifyFraction(numerator, denominator)
   },
 
@@ -190,10 +208,10 @@ const MathFunctions = {
   //C: Divide fractions (multiply by reciprocal)
   fractionDivide: (...args: any[]): string => {
     const [f1, f2] = args as string[]
-    
+
     const frac1 = parseFraction(f1)
     const frac2 = parseFraction(f2)
-    
+
     return MathFunctions.simplifyFraction(frac1.numerator * frac2.denominator, frac1.denominator * frac2.numerator)
   },
 
@@ -203,23 +221,23 @@ const MathFunctions = {
     const gcd = MathFunctions.gcd(numerator, denominator)
     const simpleNum = numerator / gcd
     const simpleDen = denominator / gcd
-    
+
     if (simpleDen === 1) return simpleNum.toString()
     if (simpleNum === 0) return "0"
-    
+
     //C: Конвертація неправильного дробу у змішане число
     //C: Convert improper fraction to mixed number
     if (Math.abs(simpleNum) > Math.abs(simpleDen)) {
       const whole = Math.trunc(simpleNum / simpleDen)
       const remainder = Math.abs(simpleNum % simpleDen)
-      
+
       if (remainder === 0) {
         return whole.toString()
       }
-      
+
       return `${whole}<sup>${remainder}</sup>/<sub>${simpleDen}</sub>`
     }
-    
+
     return `<sup>${simpleNum}</sup>/<sub>${simpleDen}</sub>`
   },
 
@@ -261,37 +279,88 @@ const MathFunctions = {
 //C: Функція парсингу рядка дробу у числові компоненти
 //C: Function to parse fraction string into numeric components
 function parseFraction(fraction: string): { numerator: number; denominator: number } {
-  //C: Парсинг змішаних дробів (наприклад, "1<sup>2</sup>/<sub>3</sub>")
-  //C: Parse mixed fractions (e.g., "1<sup>2</sup>/<sub>3</sub>")
+  logger.info('FRACTION', 'Парсинг дробу:', fraction)
+
+  //C: Обробка звичайних чисел
+  //C: Handle regular numbers
+  const num = Number(fraction)
+  if (!isNaN(num)) {
+    return { numerator: num, denominator: 1 }
+  }
+
+  //C: Парсинг змішаних дробів у HTML-форматі (наприклад, "1<sup>2</sup>/<sub>3</sub>")
+  //C: Parse mixed fractions in HTML format (e.g., "1<sup>2</sup>/<sub>3</sub>")
   const mixedMatch = fraction.match(/(-?\d+)\s*<sup>(\d+)<\/sup>\/<sub>(\d+)<\/sub>/)
   if (mixedMatch) {
     const whole = parseInt(mixedMatch[1])
     const numerator = parseInt(mixedMatch[2])
     const denominator = parseInt(mixedMatch[3])
-    return {
+    const result = {
       numerator: whole * denominator + (whole < 0 ? -numerator : numerator),
       denominator: denominator
     }
+    logger.info('FRACTION', 'Знайдено змішаний дріб:', result)
+    return result
   }
-  
-  //C: Парсинг простих дробів (наприклад, "<sup>2</sup>/<sub>3</sub>")
-  //C: Parse simple fractions (e.g., "<sup>2</sup>/<sub>3</sub>")
+
+  //C: Парсинг простих дробів у HTML-форматі (наприклад, "<sup>2</sup>/<sub>3</sub>")
+  //C: Parse simple fractions in HTML format (e.g., "<sup>2</sup>/<sub>3</sub>")
   const simpleMatch = fraction.match(/<sup>(-?\d+)<\/sup>\/<sub>(\d+)<\/sub>/)
   if (simpleMatch) {
-    return {
+    const result = {
       numerator: parseInt(simpleMatch[1]),
       denominator: parseInt(simpleMatch[2])
     }
+    logger.info('FRACTION', 'Знайдено простий дріб:', result)
+    return result
   }
-  
-  //C: Обробка цілих чисел
-  //C: Handle whole numbers
-  const num = Number(fraction)
-  if (!isNaN(num)) {
-    return { numerator: num, denominator: 1 }
+
+  //C: Парсинг звичайних дробів у текстовому форматі (наприклад, "2/3")
+  //C: Parse regular fractions in text format (e.g., "2/3")
+  const textFractionMatch = fraction.match(/(-?\d+)\s*\/\s*(\d+)/)
+  if (textFractionMatch) {
+    const result = {
+      numerator: parseInt(textFractionMatch[1]),
+      denominator: parseInt(textFractionMatch[2])
+    }
+    logger.info('FRACTION', 'Знайдено текстовий дріб:', result)
+    return result
   }
-  
+
+  //C: Спроба парсингу десяткових чисел
+  //C: Try to parse decimal numbers
+  const decimalMatch = fraction.match(/(-?\d+[.,]\d+)/)
+  if (decimalMatch) {
+    const decimalValue = Number(decimalMatch[1].replace(',', '.'))
+    if (!isNaN(decimalValue)) {
+      logger.info('FRACTION', 'Знайдено десяткове число:', decimalValue)
+      return convertDecimalToFraction(decimalValue)
+    }
+  }
+
+  logger.error('FRACTION', 'Неможливо розпізнати формат дробу:', fraction)
   throw new Error(`Invalid fraction format: ${fraction}`)
+}
+
+//C: Допоміжна функція для конвертації десяткового числа у дріб
+//C: Helper function to convert decimal number to fraction
+function convertDecimalToFraction(decimal: number): { numerator: number; denominator: number } {
+  const tolerance = 1.0E-6
+  let h1 = 1, h2 = 0
+  let k1 = 0, k2 = 1
+  let b = decimal
+  do {
+    const a = Math.floor(b)
+    let aux = h1
+    h1 = a * h1 + h2
+    h2 = aux
+    aux = k1
+    k1 = a * k1 + k2
+    k2 = aux
+    b = 1 / (b - a)
+  } while (Math.abs(decimal - h1 / k1) > decimal * tolerance)
+
+  return { numerator: h1, denominator: k1 }
 }
 
 export default MathFunctions
