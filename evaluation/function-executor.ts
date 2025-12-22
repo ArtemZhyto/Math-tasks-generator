@@ -121,7 +121,7 @@ const executeMathFunction = (func: string, args: any[]): string => {
 //C: Handle rounding function with precision parameter
 const handleRound = (args: any[]): string => {
   const value = Number(args[0])
-  const precision = args[1] ? Number(args[1]) : 1
+  const precision = args[1] ? Number(args[1]) : 1000
   return MathFunctions.round(value, precision).toString()
 }
 

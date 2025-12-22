@@ -1,6 +1,6 @@
 //C: Флаг відладки для контролю логування
 //C: Debug flag for logging control
-const DEBUG = false
+const DEBUG = true
 
 //C: Об'єкт логера для структурованого виводу інформації
 //C: Logger object for structured information output

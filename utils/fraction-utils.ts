@@ -12,7 +12,6 @@
 
 //@ Modules
 import { logger } from './logger'
-import { MEASUREMENT_UNITS } from '../constants'
 import { hasRepeatingPattern } from './number-utils'
 
 //C: Інтерфейс для розпарсеної дробової структури
