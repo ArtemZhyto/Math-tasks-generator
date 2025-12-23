@@ -38,15 +38,15 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
   //C: Generate task condition text
   const condition = generateCondition(config.condition, variables)
 
-  const correctAnswerNumber = Number(correctAnswer)
-  const isNumericResult = !isNaN(correctAnswerNumber)
-  const isFractionResult = correctAnswer.includes('<sup>') || correctAnswer.includes('/')
+	const normalizedAnswer = correctAnswer.replace(/\s/g, '').replace(',', '.')
+	const isFractionResult = correctAnswer.includes('<sup>') || correctAnswer.includes('/')
+	const isNumericResult = !isNaN(Number(normalizedAnswer)) || isFractionResult
 
   //C: Генерація варіантів відповідей якщо потрібно
   //C: Generate answer options if needed
-  const answers = shouldGenerateOptions
-    ? generateAnswers(correctAnswer, config.constraints, isNumericResult && !isFractionResult)
-    : []
+	const answers = shouldGenerateOptions
+		? generateAnswers(correctAnswer, config.constraints, isNumericResult)
+		: []
 
   return {
     testID: config.testID,

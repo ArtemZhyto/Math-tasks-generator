@@ -12,7 +12,7 @@
 
 //@ Modules
 import { logger } from '../utils/logger'
-import { formatNumberWithSpaces } from '../utils/number-utils'
+import { formatNumberWithSpaces } from './answer-generator/formatter'
 
 //C: Генерація тексту умови завдання шляхом підстановки значень змінних
 //C: Generate task condition text by substituting variable values
@@ -21,16 +21,29 @@ export const generateCondition = (
   variables: Record<string, number>
 ): string => {
   logger.info('CONDITION', 'Генерація умови:', condition)
+
   let result = condition
+	const varNames = Object.keys(variables).sort((a, b) => b.length - a.length)
 
   //C: Заміна всіх входжень змінних (@A, @B тощо) на їх числові значення
   //C: Replace all variable occurrences (@A, @B etc.) with their numeric values
-  Object.entries(variables).forEach(([varName, value]) => {
-    //C: Форматируем число с разделителями тысяч
-    //C: Format number with thousand separators
-    const formattedValue = formatNumberWithSpaces(value)
+  varNames.forEach((varName) => {
+    const value = variables[varName]
+
+    const isPartOfFraction = new RegExp(`[.,]@${varName}`).test(condition)
+
+    let formattedValue: string
+
+    if (isPartOfFraction) {
+      formattedValue = value.toString()
+    } else {
+      formattedValue = formatNumberWithSpaces(value)
+    }
+
     result = result.replace(new RegExp(`@${varName}`, 'g'), formattedValue)
   })
+
+	result = result.replace(/(\d)\.(\d)/g, '$1,$2')
 
   logger.info('CONDITION', 'Сгенерована умова:', result)
   return result

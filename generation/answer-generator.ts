@@ -47,7 +47,14 @@ const generateWrongAnswer = (
 ): string => {
   if (hasUnits) return generateWrongAnswerWithUnits(correctAnswer, constraints)
   if (isFractionAnswer) return generateFractionWrongAnswer(correctAnswer, constraints)
-  if (isNumeric) return formatNumericValue(generateWrongNumericValue(Number(correctAnswer), constraints, 50), constraints.integerResult)
+  if (isNumeric) {
+    const numericForMath = Number(correctAnswer.replace(/\s/g, '').replace(',', '.'))
+
+    return formatNumericValue(
+      generateWrongNumericValue(numericForMath, constraints, 50),
+      constraints.integerResult
+    )
+	}
   return generateStringWrongAnswer(correctAnswer, constraints)
 }
 
