@@ -23,9 +23,9 @@ export const logger = {
 
   //C: Логування помилок
   //C: Log errors
-  error: (context: string, message: string, ...args: any[]) => {
-    if (DEBUG) {
-      console.error(`❌ [${context}] ${message}`, ...args)
-    }
-  }
+	error: (context: string, message: string, ...args: any[]) => {
+		//C: Помилки логуємо завжди, навіть якщо відладка вимкнена
+		//C: Errors are always logged, even if debug is disabled
+		console.error(`❌ [${context}] ${message}`, ...args)
+	}
 }

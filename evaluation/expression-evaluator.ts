@@ -15,57 +15,45 @@ import { ALL_FUNCTIONS } from './math-functions'
 import { executeFunction, isStringLiteral } from './function-executor'
 import { logger } from '../utils/logger'
 
-//C: Головна функція для обчислення математичних виразів
-//C: Main function for evaluating mathematical expressions
+//C: Рекурсивний обчислювач математичних виразів
+//C: Recursive mathematical expression evaluator
 export const evaluateExpression = (expr: string): string => {
-  logger.info('EVALUATE', 'Початок обчислення виразу:', expr)
-  const result = evaluateRecursive(expr)
-  logger.info('EVALUATE', 'Кінцевий результат:', result)
-  return result
-}
-
-//C: Рекурсивна функція обчислення виразів з вкладеними функціями
-//C: Recursive function for evaluating expressions with nested functions
-const evaluateRecursive = (expr: string): string => {
-  logger.info('EVAL_RECURSIVE', 'Рекурсивне обчислення:', expr)
   let currentExpr = expr
-  let changed = true
+  let lastExpr = ""
   let iterations = 0
 
-  //C: Ітеративна обробка виразу поки є зміни
-  //C: Iterative expression processing while changes occur
-  while (changed && iterations < 100) {
-    changed = false
+  //C: Цикл обробки виразу до повної деконструкції всіх функцій
+  //C: Expression processing loop until all functions are fully deconstructed
+  while (currentExpr !== lastExpr && iterations < 50) {
+    lastExpr = currentExpr
     iterations++
 
-    const innermostMatch = findInnermostFunction(currentExpr)
-
-    if (innermostMatch) {
-      const [fullMatch, func, argsStr] = innermostMatch
-      //C: Парсинг аргументів функції
-      //C: Parse function arguments
+    const match = findInnermostFunction(currentExpr)
+    if (match) {
+      const [fullMatch, func, argsStr] = match
       const args = parseArguments(argsStr)
-      //C: Рекурсивне обчислення вкладених виразів у аргументах
-      //C: Recursive evaluation of nested expressions in arguments
+
+      //C: Рекурсивне обчислення вкладених аргументів-функцій
+      //C: Recursive evaluation of nested function arguments
       const evaluatedArgs = args.map(arg =>
-        arg.includes('(') && !isStringLiteral(arg) ? evaluateRecursive(arg) : arg
+        arg.includes('(') && !isStringLiteral(arg) ? evaluateExpression(arg) : arg
       )
 
-      //C: Виконання функції та заміна у вихідному виразі
-      //C: Execute function and replace in original expression
-      const result = executeFunction(func, evaluatedArgs)
-      currentExpr = currentExpr.replace(fullMatch, result)
-      changed = true
+      const rawResult = executeFunction(func, evaluatedArgs)
+      currentExpr = currentExpr.replace(fullMatch, sanitizeNumericResult(rawResult))
     }
   }
-
-  //C: Запобігання нескінченному циклу
-  //C: Prevent infinite loop
-  if (iterations >= 100) {
-    logger.warn('EVAL_RECURSIVE', 'Досягнут лимит ітерацій')
-  }
-
   return currentExpr
+}
+
+//C: Усунення похибок плаваючої коми та форматування результату
+//C: Eliminating floating point errors and formatting result
+const sanitizeNumericResult = (val: string): string => {
+  const num = parseFloat(val)
+  if (!isNaN(num) && isFinite(num) && val.includes('.')) {
+    return parseFloat(num.toPrecision(12)).toString()
+  }
+  return val
 }
 
 //C: Пошук найглибшої вкладеної функції у виразі
