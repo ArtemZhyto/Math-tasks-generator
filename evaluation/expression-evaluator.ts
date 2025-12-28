@@ -49,9 +49,13 @@ export const evaluateExpression = (expr: string): string => {
 //C: Усунення похибок плаваючої коми та форматування результату
 //C: Eliminating floating point errors and formatting result
 const sanitizeNumericResult = (val: string): string => {
-  const num = parseFloat(val)
-  if (!isNaN(num) && isFinite(num) && val.includes('.')) {
-    return parseFloat(num.toPrecision(12)).toString()
+  const isPureNumber = /^-?\d*\.?\d+$/.test(val.trim())
+
+  if (isPureNumber) {
+    const num = parseFloat(val);
+    if (isFinite(num) && val.includes('.')) {
+      return parseFloat(num.toPrecision(12)).toString()
+    }
   }
   return val
 }

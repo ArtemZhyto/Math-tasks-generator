@@ -13,3 +13,19 @@ export const STRING_RESULTS = [
   '>', '<', '=', 'Перший', 'Другий', 'Рівні', 'Так', 'Ні',
   ...MEASUREMENT_UNITS
 ]
+
+//C: Список одиниць виміру для зміни на графічні
+//C: List of units of measurement to change to graphical units
+export const UNITS_TO_SHORT: Record<string, string> = {
+  "гр": "°",
+  "см^2": "см²",
+  "м^2": "м²",
+  "км^2": "км²",
+  "см^3": "см³",
+  "м^3": "м³",
+  "км^3": "км³",
+  "м/с": "<sup>м</sup>/<sub>с</sub>",
+  "м/хв": "<sup>м</sup>/<sub>хв</sub>",
+  "км/год": "<sup>км</sup>/<sub>год</sub>",
+  "км/с": "<sup>км</sup>/<sub>с</sub>"
+}

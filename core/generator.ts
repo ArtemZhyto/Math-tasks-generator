@@ -11,6 +11,7 @@ import { generateCondition } from '../generation/condition-generator'
 import { generateAnswers } from '../generation/answer-generator'
 import { evaluateTemplate } from '../evaluation/template-processor'
 import { formatDecimal } from '../utils/number-utils'
+import { UNITS_TO_SHORT } from '../constants'
 import { logger } from '../utils/logger'
 
 //C: Імпорт логіки з підпапки генератора
@@ -48,11 +49,30 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
 		? generateAnswers(correctAnswer, config.constraints, isNumericResult)
 		: []
 
+	//C: Функція для масової заміни одиниць виміру
+	//C: Function for mass replacement of units of measurement
+	const applyGraphicalUnits = (text: string): string => {
+    let result = text
+
+    Object.entries(UNITS_TO_SHORT).forEach(([key, value]) => {
+      const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(`(\\d)\\s?${escapedKey}(\\b|\\.?|$)`, 'g')
+      result = result.replace(regex, `$1${value}`)
+    })
+
+    return result
+  }
+
+	//C: Обробляємо всі відповіді
+	//C: Process all responses
+	const finalCorrectAnswer = applyGraphicalUnits(correctAnswer)
+  const finalAnswers = answers.map(ans => applyGraphicalUnits(ans))
+
   return {
     testID: config.testID,
     condition,
-    answers,
-    correctAnswer
+    answers: finalAnswers,
+    correctAnswer: finalCorrectAnswer
   }
 }
 
