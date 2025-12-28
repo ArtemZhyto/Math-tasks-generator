@@ -52,21 +52,34 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
 	//C: Функція для масової заміни одиниць виміру
 	//C: Function for mass replacement of units of measurement
 	const applyGraphicalUnits = (text: string): string => {
-    let result = text
+		let result = text;
 
-    Object.entries(UNITS_TO_SHORT).forEach(([key, value]) => {
-      const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const regex = new RegExp(`(\\d)\\s?${escapedKey}(\\b|\\.?|$)`, 'g')
-      result = result.replace(regex, `$1${value}`)
-    })
+		// Сортуємо ключі за довжиною (від довших до коротших),
+		// щоб спочатку обробляти "км/год", а потім "км"
+		const sortedKeys = Object.keys(UNITS_TO_SHORT).sort((a, b) => b.length - a.length);
 
-    return result
-  }
+		sortedKeys.forEach((key) => {
+			const value = UNITS_TO_SHORT[key];
+			const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+			// Додаємо дужки навколо \\s? — це буде група номер 2 ($2)
+			const regex = new RegExp(`(\\d)(\\s?)${escapedKey}(\\b|\\.?|$)`, 'g');
+
+			// Додаємо $2 у результат заміни.
+			// Якщо пробіл був — він залишиться, якщо ні — нічого не додасться.
+			result = result.replace(regex, `$1$2${value}`);
+		});
+
+		return result;
+	};
 
 	//C: Обробляємо всі відповіді
 	//C: Process all responses
 	const finalCorrectAnswer = applyGraphicalUnits(correctAnswer)
   const finalAnswers = answers.map(ans => applyGraphicalUnits(ans))
+
+	logger.info(`GENERATOR`, `Фінальна правильна відповідь: ${finalCorrectAnswer}`)
+	logger.info(`GENERATOR`, `Фінальні варіанти відповідей: ${finalAnswers}`)
 
   return {
     testID: config.testID,
