@@ -1,3 +1,13 @@
+/**
+ * Copyright 2025 ArtemZhyto
+ * * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+
+
 //C: Основний генератор математичних завдань
 //C: Main mathematical task generator
 
