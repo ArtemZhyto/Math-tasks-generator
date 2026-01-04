@@ -5,7 +5,15 @@ const DEBUG = true
 //C: Об'єкт логера для структурованого виводу інформації
 //C: Logger object for structured information output
 export const logger = {
-  //C: Логування інформаційних повідомлень
+	//C: Перший лог генератора з новим рядком для кращої читаємості
+	//C: First generator log with a newline for better readability
+	start: (context: string, message: string, ...args: any[]) => {
+    if (DEBUG) {
+      console.log(`\n\n📝 [${context}] ${message}`, ...args)
+    }
+  },
+
+	//C: Логування інформаційних повідомлень
   //C: Log informational messages
   info: (context: string, message: string, ...args: any[]) => {
     if (DEBUG) {

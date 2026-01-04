@@ -21,13 +21,15 @@ export const formatDecimal = (numberStr: string, finalFormat: boolean = false, a
 
   const { numericPart, units } = extractNumericAndUnits(numberStr)
 
+  const isAlgebraic = /[a-zA-Z]/.test(units)
+  const actualAddSpace = isAlgebraic ? false : addSpace
+
   const num = Number(numericPart.replace(',', '.'))
+
   if (isNaN(num)) {
     return numberStr
   }
 
-  //C: Не форматуємо дроби
-  //C: Don't format fractions
   if (numberStr.includes('<sup>') || numberStr.includes('/')) {
     return numberStr
   }
@@ -35,7 +37,7 @@ export const formatDecimal = (numberStr: string, finalFormat: boolean = false, a
   const formattedNumeric = formatNumericPart(num, finalFormat)
 
   if (units) {
-    return addSpace ? `${formattedNumeric} ${units}`.trim() : `${formattedNumeric}${units}`
+    return actualAddSpace ? `${formattedNumeric} ${units}`.trim() : `${formattedNumeric}${units}`
   }
 
   return formattedNumeric

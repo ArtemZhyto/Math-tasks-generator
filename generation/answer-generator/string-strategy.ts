@@ -1,7 +1,7 @@
 //@ Modules
 import { IConstraints } from '../../types'
 import { generateWrongNumericValue } from './numeric-strategy'
-import { formatNumericValue } from './formatter'
+import { formatNumericValue } from '../../utils/number-utils/formatter'
 
 //C: Генерація строкової неправильної відповіді
 //C: Generate string wrong answer

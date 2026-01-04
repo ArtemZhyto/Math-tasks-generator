@@ -49,3 +49,22 @@ export const hasRepeatingPattern = (decimalPart: string): boolean => {
 
   return false
 }
+
+//C: Форматування числового значення з урахуванням обмежень
+//C: Format numeric value considering constraints
+export const formatNumericValue = (value: number, integerResult?: boolean): string => {
+  if (integerResult) {
+    value = Math.round(value)
+  }
+
+  const sign = value < 0 ? '-' : ''
+  const absoluteValue = Math.abs(value)
+
+  if (Number.isInteger(absoluteValue)) {
+    return formatNumberWithSpaces(absoluteValue)
+  }
+
+  const [integerPart, decimalPart] = absoluteValue.toString().split('.')
+  const formattedInteger = formatNumberWithSpaces(Number(integerPart))
+  return sign + formattedInteger + ',' + decimalPart
+}

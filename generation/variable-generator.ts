@@ -11,11 +11,11 @@
 
 
 //@ Modules
+import { logger } from '../utils/logger'
 import { IVariableConfig, IConstraints } from '../types'
-import MathFunctions from '../evaluation/math-functions'
 import { evaluateNumericPart } from '../evaluation/template-processor'
 import { hasEqualNumeratorDenominator } from '../core/constraint-checker'
-import { logger } from '../utils/logger'
+import MathFunctions, { ALL_FUNCTIONS } from '../evaluation/math-functions'
 
 //C: Генерація значень змінних для математичного виразу з урахуванням обмежень
 //C: Generate variable values for mathematical expression considering constraints
@@ -28,19 +28,19 @@ export const generateVariables = (
   const variables: Record<string, number> = {}
   let attempts = 0
   const MAX_ATTEMPTS = 100
-  
+
   //C: Якщо шаблон містить строкові функції, пропускаємо перевірку цілочисельності
   //C: If template contains string functions, skip integer check
   const hasStringFunctions = /greater|less|equal|compare|isPrime/.test(template)
-  
+
   do {
     logger.info(`VARIABLES`, `Спроба ${attempts + 1}`)
-    
+
     //C: Генерація значень для кожної змінної з конфігурації
     Object.entries(variablesConfig).forEach(([varName, config]) => {
       variables[varName] = generateVariableValue(config)
     })
-    
+
     attempts++
 
     if (attempts >= MAX_ATTEMPTS) {
@@ -63,9 +63,9 @@ export const generateVariables = (
       logger.info('VARIABLES', 'Усі перевірки пройдені')
       break
     }
-    
+
   } while (attempts < MAX_ATTEMPTS)
-  
+
   return variables
 }
 
@@ -80,17 +80,17 @@ const generateVariableValue = (config: IVariableConfig): number => {
     logger.info('VARIABLES', `Значення зі списку: ${values[randomIndex]}`)
     return values[randomIndex]
   }
-  
+
   //C: Генерація випадкового числа з заданого діапазону
   //C: Generate random number from specified range
   const [min, max] = config.range!
   let value: number
   let innerAttempts = 0
-  
+
   do {
     value = MathFunctions.randomInt(min, max)
     innerAttempts++
-    
+
     //C: Пропуск виключених значень з обмеженням спроб
     //C: Skip excluded values with attempt limit
     if (config.exclude?.includes(value) && innerAttempts < 20) {
@@ -98,7 +98,7 @@ const generateVariableValue = (config: IVariableConfig): number => {
     }
     break
   } while (innerAttempts < 20)
-  
+
   logger.info('VARIABLES', `Значення із діапазону ${min}-${max}: ${value}`)
   return value
 }
@@ -107,37 +107,38 @@ const generateVariableValue = (config: IVariableConfig): number => {
 //C: Check if numeric part of result is integer
 const checkIntegerResult = (template: string, variables: Record<string, number>): boolean => {
   logger.info('VARIABLES', 'Перевірка цілочисленості результату')
-  
+
   //C: Якщо шаблон містить строкові функції, повністю пропускаємо перевірку
   //C: If template contains string functions, completely skip check
-  const hasStringFunctions = /greater|less|equal|compare|isPrime/.test(template)
+  const functionsRegex = new RegExp(ALL_FUNCTIONS.join('|'))
+	const hasStringFunctions = functionsRegex.test(template)
+
   if (hasStringFunctions) {
     logger.info('VARIABLES', 'Повний пропуск: шаблон містить строкові функції')
     return true
   }
-  
+
   try {
     //C: Обчислення числової частини виразу для перевірки
     //C: Calculate numeric part of expression for verification
     const result = evaluateNumericPart(template, variables)
-    
+
     //C: Якщо результат - рядок, пропускаємо перевірку (це строковий результат)
     //C: If result is string, skip check (it's string result)
     if (typeof result === 'string') {
       logger.info('VARIABLES', 'Пропуск: строковий результат')
       return true
     }
-    
+
     //C: Перевірка чисельного результату
     //C: Check numeric result
     if (!Number.isInteger(result)) {
       logger.info('VARIABLES', 'Пропуск: числова частина не ціле число')
       return false
     }
-    
+
     logger.info('VARIABLES', 'Числова частина - ціле число')
     return true
-    
   } catch (error) {
     //C: При помилці обчислення приймаємо результат (ймовірно строковий)
     //C: On calculation error accept result (probably string)

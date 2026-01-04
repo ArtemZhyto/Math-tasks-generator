@@ -20,10 +20,12 @@ import { validateConfig } from './generator/config'
 import { extractNumericValue } from './generator/parser'
 import { isValidResult } from './generator/validator'
 
+const SORTED_UNIT_KEYS = Object.keys(UNITS_TO_SHORT).sort((a, b) => b.length - a.length)
+
 //C: Головна функція генерації завдання
 //C: Main function for generating task
 export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
-  logger.info('GENERATOR', 'Запуск генератора з конфігом:', config)
+	logger.start('GENERATOR', 'Запуск генератора з конфігом:', config)
 
   validateConfig(config)
 
@@ -54,9 +56,7 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
 	const applyGraphicalUnits = (text: string): string => {
 		let result = text
 
-		const sortedKeys = Object.keys(UNITS_TO_SHORT).sort((a, b) => b.length - a.length)
-
-		sortedKeys.forEach((key) => {
+		SORTED_UNIT_KEYS.forEach((key) => {
 			const value = UNITS_TO_SHORT[key]
 			const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 			const regex = new RegExp(`(\\d)(\\s?)${escapedKey}(\\b|\\.?|$)`, 'g')
@@ -73,7 +73,7 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
   const finalAnswers = answers.map(ans => applyGraphicalUnits(ans))
 
 	logger.info(`GENERATOR`, `Фінальна правильна відповідь: ${finalCorrectAnswer}`)
-	logger.info(`GENERATOR`, `Фінальні варіанти відповідей: ${finalAnswers}`)
+	logger.info(`GENERATOR`, `Фінальні варіанти відповідей: ${finalAnswers.length > 0 ? finalAnswers.join(', ') : 'Немає'}`)
 
   return {
     testID: config.testID,

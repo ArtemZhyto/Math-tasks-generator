@@ -12,7 +12,7 @@
 
 //@ Modules
 import { logger } from '../utils/logger'
-import { formatNumberWithSpaces } from './answer-generator/formatter'
+import { formatNumberWithSpaces } from '../utils/number-utils'
 
 //C: Генерація тексту умови завдання шляхом підстановки значень змінних
 //C: Generate task condition text by substituting variable values

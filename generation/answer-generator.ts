@@ -12,7 +12,8 @@ import { formatDecimal } from '../utils/number-utils'
 import { generateWrongNumericValue, roundToThousandthsIfNeeded } from './answer-generator/numeric-strategy'
 import { generateFractionVariation } from './answer-generator/fraction-strategy'
 import { generateStringWrongAnswer } from './answer-generator/string-strategy'
-import { formatNumericValue } from './answer-generator/formatter'
+import { generateWrongAlgebraicAnswer } from './answer-generator/algebraic-strategy'
+import { formatNumericValue } from '../utils/number-utils/formatter'
 
 export const generateAnswers = (
   correctAnswer: string,
@@ -30,10 +31,18 @@ export const generateAnswers = (
   const isFractionAnswer = correctAnswer.includes('<sup>') || correctAnswer.includes('/')
   const hasUnits = MEASUREMENT_UNITS.some(unit => correctAnswer.includes(unit))
 
-  while (answers.size < 4) {
-    let wrongAnswer = generateWrongAnswer(correctAnswer, constraints, isNumeric, isFractionAnswer, hasUnits)
-    if (!answers.has(wrongAnswer)) answers.add(wrongAnswer)
-  }
+	let maxWrongAttempts = 100
+	let wrongAttempts = 0
+
+	while (answers.size < 4 && wrongAttempts < maxWrongAttempts) {
+		let wrongAnswer = generateWrongAnswer(correctAnswer, constraints, isNumeric, isFractionAnswer, hasUnits)
+
+		if (!answers.has(wrongAnswer)) {
+			answers.add(wrongAnswer)
+		}
+
+		wrongAttempts++
+	}
 
   return Array.from(answers).sort(() => Math.random() - 0.5)
 }
@@ -45,17 +54,25 @@ const generateWrongAnswer = (
   isFractionAnswer: boolean,
   hasUnits: boolean
 ): string => {
-  if (hasUnits) return generateWrongAnswerWithUnits(correctAnswer, constraints)
+  const hasLetters = /[a-zA-Z]/.test(correctAnswer)
+
+  if (hasLetters) return generateWrongAlgebraicAnswer(correctAnswer)
+
   if (isFractionAnswer) return generateFractionWrongAnswer(correctAnswer, constraints)
+  if (hasUnits) return generateWrongAnswerWithUnits(correctAnswer, constraints)
+
   if (isNumeric) {
     const numericForMath = Number(correctAnswer.replace(/\s/g, '').replace(',', '.'))
 
-    return formatNumericValue(
-      generateWrongNumericValue(numericForMath, constraints, 50),
-      constraints.integerResult
-    )
-	}
-  return generateStringWrongAnswer(correctAnswer, constraints)
+		if (!isNaN(numericForMath)) {
+			return formatNumericValue(
+				generateWrongNumericValue(numericForMath, constraints, 50),
+				constraints.integerResult
+			)
+    }
+  }
+
+	return generateStringWrongAnswer(correctAnswer, constraints);
 }
 
 const generateWrongAnswerWithUnits = (correctAnswer: string, constraints: IConstraints): string => {
