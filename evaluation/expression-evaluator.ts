@@ -43,20 +43,28 @@ export const evaluateExpression = (expr: string): string => {
       currentExpr = currentExpr.replace(fullMatch, sanitizeNumericResult(rawResult))
     }
   }
+
   return currentExpr
 }
 
-//C: Усунення похибок плаваючої коми та форматування результату
-//C: Eliminating floating point errors and formatting result
+//C: Усунення похибок плаваючої коми та округлення до 1000-ї частини з логуванням
+//C: Eliminating floating point errors and rounding to the 1000th part with logging
 const sanitizeNumericResult = (val: string): string => {
   const isPureNumber = /^-?\d*\.?\d+$/.test(val.trim())
 
   if (isPureNumber) {
     const num = parseFloat(val);
-    if (isFinite(num) && val.includes('.')) {
-      return parseFloat(num.toPrecision(12)).toString()
+    if (isFinite(num)) {
+      logger.info('SANITIZE', 'Значення до округлення:', num)
+
+      const rounded = Math.round(num * 1000) / 1000
+
+      logger.info('SANITIZE', 'Значення після округлення (1000-на):', rounded)
+
+      return rounded.toString()
     }
   }
+
   return val
 }
 

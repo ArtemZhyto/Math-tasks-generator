@@ -31,6 +31,7 @@ export const evaluateTemplate = (template: string, variables: Record<string, num
   //C: Обчислення математичного виразу з функціями
   //C: Evaluate mathematical expression with functions
   const result = evaluateExpression(expression)
+
   logger.info('TEMPLATE', 'Кінцевий результат:', result)
   return result
 }
