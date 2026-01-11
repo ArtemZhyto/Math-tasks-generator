@@ -142,6 +142,7 @@ const MathFunctions = {
   denominator: (fraction: string): number => parseFraction(fraction).denominator,
 
   //C: Проксі до Arithmetic модулю
+	//C: Proxy to Arithmetic module
   gcd: (a: number, b: number): number => Arithmetic.gcd(a, b),
   lcm: (a: number, b: number): number => Arithmetic.lcm(a, b),
   simplifyFraction: (n: number, d: number): string => Arithmetic.simplifyFraction(n, d),

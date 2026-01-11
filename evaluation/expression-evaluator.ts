@@ -47,21 +47,16 @@ export const evaluateExpression = (expr: string): string => {
   return currentExpr
 }
 
-//C: Усунення похибок плаваючої коми та округлення до 1000-ї частини з логуванням
-//C: Eliminating floating point errors and rounding to the 1000th part with logging
+//C: Усунення похибок плаваючої коми та форматування результату
+//C: Eliminating floating point errors and formatting result
 const sanitizeNumericResult = (val: string): string => {
   const isPureNumber = /^-?\d*\.?\d+$/.test(val.trim())
 
   if (isPureNumber) {
-    const num = parseFloat(val);
-    if (isFinite(num)) {
-      logger.info('SANITIZE', 'Значення до округлення:', num)
+    const num = parseFloat(val)
 
-      const rounded = Math.round(num * 1000) / 1000
-
-      logger.info('SANITIZE', 'Значення після округлення (1000-на):', rounded)
-
-      return rounded.toString()
+    if (isFinite(num) && val.includes('.')) {
+      return parseFloat(num.toFixed(4)).toString()
     }
   }
 

@@ -59,7 +59,7 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
 		SORTED_UNIT_KEYS.forEach((key) => {
 			const value = UNITS_TO_SHORT[key]
 			const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-			const regex = new RegExp(`(\\d)(\\s?)${escapedKey}(\\b|\\.?|$)`, 'g')
+			const regex = new RegExp(`(\\d)(\\s?)${escapedKey}(?![а-яіїєґ])(\\b|\\.?|$)`, 'g')
 
 			result = result.replace(regex, `$1$2${value}`)
 		})

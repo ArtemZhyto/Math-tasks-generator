@@ -20,10 +20,12 @@ export const generateAnswers = (
   constraints: IConstraints,
   isNumeric: boolean
 ): string[] => {
-  logger.info('ANSWERS', 'Генерація варіантів для:', correctAnswer, 'isNumeric:', isNumeric)
-
   const shouldGenerateOptions = constraints.canGenerateWrongAnswer && Math.random() > 0.5
-  if (!shouldGenerateOptions) return []
+
+  if (!shouldGenerateOptions) {
+    logger.info('ANSWERS', 'Генерацію варіантів пропущено')
+    return []
+  }
 
   const answers = new Set<string>()
   answers.add(correctAnswer)
@@ -31,20 +33,24 @@ export const generateAnswers = (
   const isFractionAnswer = correctAnswer.includes('<sup>') || correctAnswer.includes('/')
   const hasUnits = MEASUREMENT_UNITS.some(unit => correctAnswer.includes(unit))
 
-	let maxWrongAttempts = 100
-	let wrongAttempts = 0
+  let maxWrongAttempts = 100
+  let wrongAttempts = 0
 
-	while (answers.size < 4 && wrongAttempts < maxWrongAttempts) {
-		let wrongAnswer = generateWrongAnswer(correctAnswer, constraints, isNumeric, isFractionAnswer, hasUnits)
+  while (answers.size < 4 && wrongAttempts < maxWrongAttempts) {
+    let wrongAnswer = generateWrongAnswer(correctAnswer, constraints, isNumeric, isFractionAnswer, hasUnits)
 
-		if (!answers.has(wrongAnswer)) {
-			answers.add(wrongAnswer)
-		}
+    if (!answers.has(wrongAnswer)) {
+      answers.add(wrongAnswer)
+      logger.info('ANSWERS', `Додано варіант #${answers.size}: ${wrongAnswer}`)
+    }
 
-		wrongAttempts++
-	}
+    wrongAttempts++
+  }
 
-  return Array.from(answers).sort(() => Math.random() - 0.5)
+  const finalArray = Array.from(answers).sort(() => Math.random() - 0.5)
+  logger.info('ANSWERS', `Фінальний набір: [${finalArray.join(' | ')}]`)
+
+  return finalArray
 }
 
 const generateWrongAnswer = (
@@ -54,25 +60,36 @@ const generateWrongAnswer = (
   isFractionAnswer: boolean,
   hasUnits: boolean
 ): string => {
+  if (isFractionAnswer || correctAnswer.includes('<sup>')) {
+    logger.info('WRONG_GEN', 'Стратегія: Дроби')
+    const result = generateFractionWrongAnswer(correctAnswer, constraints)
+    return formatDecimal(result, true)
+  }
+
   const hasLetters = /[a-zA-Z]/.test(correctAnswer)
 
-  if (hasLetters) return generateWrongAlgebraicAnswer(correctAnswer)
+  if (hasLetters) {
+    logger.info('WRONG_GEN', 'Стратегія: Алгебра')
+    return generateWrongAlgebraicAnswer(correctAnswer)
+  }
 
-  if (isFractionAnswer) return generateFractionWrongAnswer(correctAnswer, constraints)
-  if (hasUnits) return generateWrongAnswerWithUnits(correctAnswer, constraints)
+  if (hasUnits) {
+    logger.info('WRONG_GEN', 'Стратегія: Одиниці вимірювання')
+    return generateWrongAnswerWithUnits(correctAnswer, constraints)
+  }
 
   if (isNumeric) {
+    logger.info('WRONG_GEN', 'Стратегія: Числа')
     const numericForMath = Number(correctAnswer.replace(/\s/g, '').replace(',', '.'))
 
-		if (!isNaN(numericForMath)) {
-			return formatNumericValue(
-				generateWrongNumericValue(numericForMath, constraints, 50),
-				constraints.integerResult
-			)
+    if (!isNaN(numericForMath)) {
+      const wrongVal = generateWrongNumericValue(numericForMath, constraints, 50)
+      return formatNumericValue(wrongVal, constraints.integerResult)
     }
   }
 
-	return generateStringWrongAnswer(correctAnswer, constraints);
+  logger.info('WRONG_GEN', 'Стратегія: Рядок (за замовчуванням)')
+  return generateStringWrongAnswer(correctAnswer, constraints)
 }
 
 const generateWrongAnswerWithUnits = (correctAnswer: string, constraints: IConstraints): string => {
