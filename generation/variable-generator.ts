@@ -96,6 +96,7 @@ const generateVariableValue = (config: IVariableConfig): number => {
     if (config.exclude?.includes(value) && innerAttempts < 20) {
       continue
     }
+
     break
   } while (innerAttempts < 20)
 

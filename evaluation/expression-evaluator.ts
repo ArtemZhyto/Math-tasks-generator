@@ -56,7 +56,7 @@ const sanitizeNumericResult = (val: string): string => {
     const num = parseFloat(val)
 
     if (isFinite(num) && val.includes('.')) {
-      return parseFloat(num.toFixed(4)).toString()
+      return parseFloat(num.toFixed(3)).toString()
     }
   }
 

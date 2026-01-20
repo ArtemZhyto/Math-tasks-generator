@@ -60,17 +60,18 @@ const generateWrongAnswer = (
   isFractionAnswer: boolean,
   hasUnits: boolean
 ): string => {
-  if (isFractionAnswer || correctAnswer.includes('<sup>')) {
+  const hasLetters = /[a-zA-Z]/.test(correctAnswer)
+  const hasSupTag = correctAnswer.includes('<sup>')
+
+  if (hasLetters || hasSupTag) {
+    logger.info('WRONG_GEN', 'Стратегія: Алгебра')
+    return generateWrongAlgebraicAnswer(correctAnswer)
+  }
+
+  if (isFractionAnswer) {
     logger.info('WRONG_GEN', 'Стратегія: Дроби')
     const result = generateFractionWrongAnswer(correctAnswer, constraints)
     return formatDecimal(result, true)
-  }
-
-  const hasLetters = /[a-zA-Z]/.test(correctAnswer)
-
-  if (hasLetters) {
-    logger.info('WRONG_GEN', 'Стратегія: Алгебра')
-    return generateWrongAlgebraicAnswer(correctAnswer)
   }
 
   if (hasUnits) {
