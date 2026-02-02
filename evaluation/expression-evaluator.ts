@@ -66,8 +66,33 @@ const sanitizeNumericResult = (val: string): string => {
 //C: Пошук найглибшої вкладеної функції у виразі
 //C: Find innermost nested function in expression
 const findInnermostFunction = (expr: string): RegExpMatchArray | null => {
-  const functionRegex = new RegExp(`(${ALL_FUNCTIONS.join('|')})\\(([^()]*)\\)`)
-  return expr.match(functionRegex)
+  const functionNames = ALL_FUNCTIONS.join('|')
+  const regex = new RegExp(`(${functionNames})\\(`, 'g')
+
+  let match
+
+  while ((match = regex.exec(expr)) !== null) {
+    let depth = 1
+    let i = match.index + match[0].length
+    let inQuotes = false
+
+    for (; i < expr.length; i++) {
+      if (expr[i] === "'" || expr[i] === '"') inQuotes = !inQuotes
+      if (inQuotes) continue
+
+      if (expr[i] === '(') depth++
+      if (expr[i] === ')') depth--
+
+      if (depth === 0) {
+        const fullMatch = expr.substring(match.index, i + 1)
+        const argsStr = expr.substring(match.index + match[0].length, i)
+
+        return [fullMatch, match[1], argsStr] as RegExpMatchArray
+      }
+    }
+  }
+
+  return null
 }
 
 //C: Парсинг рядка аргументів функції на окремі параметри

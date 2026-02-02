@@ -62,21 +62,23 @@ const generateWrongAnswer = (
 ): string => {
   const hasLetters = /[a-zA-Z]/.test(correctAnswer)
   const hasSupTag = correctAnswer.includes('<sup>')
+	const isAlgebraicStructure = /[=();{}]/.test(correctAnswer)
 
-  if (hasLetters || hasSupTag) {
+  if (hasLetters || hasSupTag || isAlgebraicStructure) {
     logger.info('WRONG_GEN', 'Стратегія: Алгебра')
     return generateWrongAlgebraicAnswer(correctAnswer)
+  }
+
+	if (hasUnits) {
+    logger.info('WRONG_GEN', 'Стратегія: Одиниці вимірювання')
+    return generateWrongAnswerWithUnits(correctAnswer, constraints)
   }
 
   if (isFractionAnswer) {
     logger.info('WRONG_GEN', 'Стратегія: Дроби')
     const result = generateFractionWrongAnswer(correctAnswer, constraints)
-    return formatDecimal(result, true)
-  }
 
-  if (hasUnits) {
-    logger.info('WRONG_GEN', 'Стратегія: Одиниці вимірювання')
-    return generateWrongAnswerWithUnits(correctAnswer, constraints)
+    return formatDecimal(result, true)
   }
 
   if (isNumeric) {

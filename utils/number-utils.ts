@@ -14,9 +14,15 @@ export { randomInt, formatNumberWithSpaces, hasRepeatingPattern }
 export const formatDecimal = (numberStr: string, finalFormat: boolean = false, addSpace: boolean = true): string => {
   logger.info('FORMAT', 'Форматування числа:', numberStr, 'finalFormat:', finalFormat, 'addSpace:', addSpace)
 
-  if (isCompletelyStringResult(numberStr)) {
-    logger.info('FORMAT', 'Повністю строковий результат, повертаємо як є:', numberStr)
-    return numberStr
+	const isStructure = numberStr.includes('=') ||
+                      numberStr.includes(';') ||
+                      numberStr.includes('(') ||
+                      isCompletelyStringResult(numberStr)
+
+  if (isStructure) {
+    logger.info('FORMAT', 'Структурний або строковий результат, повертаємо як є:', numberStr)
+
+    return numberStr.replace(/\./g, ',')
   }
 
   const { numericPart, units } = extractNumericAndUnits(numberStr)
