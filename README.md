@@ -63,7 +63,7 @@ Pass a config object to `generateTask()`:
 ```javascript
 const config = {
   condition: "Calculate the perimeter of a rectangle with sides @A cm and @B cm",
-  template: "concat(multiply(2, sum(@A, @B)), ' см')",
+  template: "concat(multiply(2, sum(@A, @B)), ' cm')",
   variables: {
     A: { range: [5, 12] },
     B: { range: [8, 15] }
@@ -82,8 +82,8 @@ const task = generateTask(config);
 ```javascript
 {
   condition: "Calculate the perimeter of a rectangle with sides 7 cm and 10 cm",
-  answers: ["34 см", "17 см", "24 см", "70 см"],
-  correctAnswer: "34 см"
+  answers: ["34 cm", "17 cm", "24 cm", "70 cm"],
+  correctAnswer: "34 cm"
 }
 ```
 
