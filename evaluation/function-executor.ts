@@ -113,6 +113,19 @@ const executeMathFunction = (func: string, args: any[]): string => {
     case 'toDecimal': return MathFunctions.toDecimal(args[0]).toString()
     case 'toFraction': return handleToFraction(args)
 
+		//C: Тригонометричні функції
+		//C: Trigonometric functions
+		case 'sin': return MathFunctions.sin(Number(args[0])).toString()
+		case 'cos': return MathFunctions.cos(Number(args[0])).toString()
+		case 'tg': return MathFunctions.tg(Number(args[0])).toString()
+		case 'ctg': return MathFunctions.ctg(Number(args[0])).toString()
+
+		//C: Аркфункції
+		//C: Arc-functions
+		case 'asin': return MathFunctions.asin(Number(args[0])).toString()
+		case 'acos': return MathFunctions.acos(Number(args[0])).toString()
+		case 'atan': return MathFunctions.atan(Number(args[0])).toString()
+
     default: throw new Error(`Unknown function: ${func}`)
   }
 }

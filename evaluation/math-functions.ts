@@ -6,6 +6,7 @@ import { logger } from '../utils/logger'
 import { ALL_FUNCTIONS } from './math-functions/constants'
 import { parseFraction } from './math-functions/parser'
 import { Arithmetic } from './math-functions/arithmetic'
+import { Trigonometry } from './math-functions/trigonometry'
 
 export { ALL_FUNCTIONS }
 
@@ -146,6 +147,23 @@ const MathFunctions = {
   gcd: (a: number, b: number): number => Arithmetic.gcd(a, b),
   lcm: (a: number, b: number): number => Arithmetic.lcm(a, b),
   simplifyFraction: (n: number, d: number): string => Arithmetic.simplifyFraction(n, d),
+
+	//C: Тригонометричні функції (приймають градуси)
+  //C: Trigonometric functions (accept degrees)
+	sin: (a: number): number => MathFunctions.round(Trigonometry.sin(a)),
+  cos: (a: number): number => MathFunctions.round(Trigonometry.cos(a)),
+  tg: (a: number): number => MathFunctions.round(Trigonometry.tg(a)),
+  ctg: (a: number): number => MathFunctions.round(Trigonometry.ctg(a)),
+
+  //C: Аркфункції (повертають результат у градусах)
+  //C: Arc-functions (return result in degrees)
+  asin: (a: number): number => MathFunctions.round((Math.asin(a) * 180) / Math.PI),
+  acos: (a: number): number => MathFunctions.round((Math.acos(a) * 180) / Math.PI),
+  atan: (a: number): number => MathFunctions.round((Math.atan(a) * 180) / Math.PI),
+
+  //C: Проксі до Trigonometry модулю
+  //C: Proxy to Trigonometry module
+  toRadians: (d: number): number => Trigonometry.toRadians(d),
 
   randomInt: (min: number, max: number): number => {
     return Math.floor(Math.random() * (max - min + 1)) + min

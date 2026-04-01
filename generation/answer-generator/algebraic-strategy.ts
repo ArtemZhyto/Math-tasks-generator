@@ -2,29 +2,41 @@
 import { Arithmetic } from "../../evaluation/math-functions/arithmetic"
 
 export const generateWrongAlgebraicAnswer = (correctAnswer: string): string => {
-  const fractionRegex = /(\d+)?(?:<sup>(\d+)<\/sup>\/<sub>(\d+)<\/sub>)/g
+  const fractionRegex = /(-)?(\d+)?(?:<sup>(\d+)<\/sup>\/<sub>(\d+)<\/sub>)/g
   let resultText = correctAnswer
 
-  resultText = resultText.replace(fractionRegex, (match, whole, num, den) => {
+  resultText = resultText.replace(fractionRegex, (match, minus, whole, num, den) => {
     let w = whole ? Number(whole) : 0
     let n = Number(num)
     let d = Number(den)
+    const hasMinus = !!minus
 
     const dice = Math.random()
 
-    if (dice < 0.5) w += (Math.random() > 0.5 ? 1 : -1)
+		if (dice < 0.5) w += (Math.random() > 0.5 ? 1 : -1)
     else n += (Math.random() > 0.5 ? 1 : -1)
 
-    return Arithmetic.simplifyFraction(w * d + n, d)
+    let totalNumerator = w * d + n
+
+    if (hasMinus) totalNumerator = -totalNumerator
+
+    const simplified = Arithmetic.simplifyFraction(totalNumerator, d)
+
+    if (simplified.includes('-')) {
+      const pureFraction = simplified.replace(/-/g, '')
+
+      return `-${pureFraction}`
+    }
+
+    return simplified
   })
 
   const numberRegex = /([+-]?)\s*(\d+[.,]?\d*)/g
 
   resultText = resultText.replace(numberRegex, (match, sign, numStr, offset) => {
     const before = resultText.slice(0, offset)
-    const after = resultText.slice(offset + match.length)
 
-    if (before.lastIndexOf('<sup') > before.lastIndexOf('</h4>') ||
+    if (before.lastIndexOf('<sup') > before.lastIndexOf('</sup>') ||
         before.lastIndexOf('<sub') > before.lastIndexOf('</sub>')) {
       return match
     }
@@ -34,7 +46,6 @@ export const generateWrongAlgebraicAnswer = (correctAnswer: string): string => {
     if (isNaN(num)) return match
 
     let result: number
-
     const dice = Math.random()
 
     if (dice < 0.4) {
@@ -46,38 +57,27 @@ export const generateWrongAlgebraicAnswer = (correctAnswer: string): string => {
       result = num <= 5 ? num + 10 : num - 4
     }
 
-    result = Math.max(1, Math.abs(Math.round(result)))
-
-    let formattedNum = numStr.includes(',') ? result.toString().replace('.', ',') : result.toString()
+    const finalAbsNum = Math.max(1, Math.abs(Math.round(result)))
+    let formattedNum = numStr.includes(',') ? finalAbsNum.toString().replace('.', ',') : finalAbsNum.toString()
 
     const trimmedBefore = before.trim()
-    const trimmedAfter = after.trim()
 
     if (sign) {
       const isUnary = offset === 0 ||
-                      trimmedBefore.endsWith('=') ||
-                      trimmedBefore.endsWith('(') ||
-                      trimmedBefore.endsWith(';')
+                      /[[(=;]/.test(trimmedBefore.slice(-1))
 
       if (isUnary) {
-        const spaceBefore = (offset === 0 || trimmedBefore.endsWith('(') || trimmedBefore.endsWith(';')) ? '' : ' '
+        const needsSpace = offset !== 0 && !trimmedBefore.endsWith('(') && !trimmedBefore.endsWith(';')
 
-        return `${spaceBefore}${sign}${formattedNum}`
+        return `${needsSpace ? ' ' : ''}${sign}${formattedNum}`
       }
 
       return ` ${sign} ${formattedNum}`
-    } else {
-      const isCoordinatePart = trimmedBefore.endsWith('(') ||
-                               trimmedBefore.endsWith(';') ||
-                               trimmedAfter.startsWith(';') ||
-                               trimmedAfter.startsWith(')')
-
-      if (isCoordinatePart) return formattedNum
-
-      if (trimmedBefore.endsWith('=')) return ` ${formattedNum}`
-
-      return formattedNum
     }
+
+    const endsWithComparison = /[=><≥≤]/.test(trimmedBefore.slice(-1))
+
+    return (endsWithComparison ? ` ${formattedNum}` : formattedNum)
   })
 
   return resultText

@@ -54,18 +54,25 @@ export const generateTask = (config: IGeneratorConfig): IGeneratedTask => {
 	//C: Функція для масової заміни одиниць виміру
 	//C: Function for mass replacement of units of measurement
 	const applyGraphicalUnits = (text: string): string => {
-		let result = text
+    let result = text
 
-		SORTED_UNIT_KEYS.forEach((key) => {
-			const value = UNITS_TO_SHORT[key]
-			const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-			const regex = new RegExp(`(\\d)(\\s?)${escapedKey}(?![а-яіїєґ])(\\b|\\.?|$)`, 'g')
+    SORTED_UNIT_KEYS.forEach((key) => {
+      const value = UNITS_TO_SHORT[key]
+      const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-			result = result.replace(regex, `$1$2${value}`)
-		})
+      const regex = new RegExp(`(\\d)(\\s?)${escapedKey}(?![а-яіїєґ])(\\b|\\.?|$)`, 'g')
 
-		return result
-	}
+      result = result.replace(regex, (match, p1, p2, p3) => {
+        if (value === '°') {
+          return `${p1}${value}${p3}`
+        }
+
+        return `${p1}${p2}${value}${p3}`
+      })
+    })
+
+    return result
+  }
 
 	//C: Обробляємо всі відповіді
 	//C: Process all responses

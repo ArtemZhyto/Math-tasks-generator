@@ -9,38 +9,28 @@ export const generateFractionVariation = (
   constraints: IConstraints,
   correctAnswer: string
 ): string => {
-  let attempts = 0
-  while (attempts < 20) {
+  for (let attempts = 0; attempts < 20; attempts++) {
     const strategy = Math.floor(Math.random() * 5)
-    let wrongNumerator = correct.numerator
-    let wrongDenominator = correct.denominator
+    let n = correct.numerator
+    let d = correct.denominator
 
-    switch (strategy) {
-      case 0: wrongNumerator = correct.numerator + MathFunctions.randomInt(-3, 3); break
-      case 1: wrongDenominator = correct.denominator + MathFunctions.randomInt(-2, 2); break
-      case 2:
-        wrongNumerator = correct.numerator + MathFunctions.randomInt(-2, 2)
-        wrongDenominator = correct.denominator + MathFunctions.randomInt(-1, 1)
-        break
-      case 3:
-        const factor = MathFunctions.randomInt(1, 3)
-        wrongNumerator = correct.numerator * factor + MathFunctions.randomInt(-1, 1)
-        wrongDenominator = correct.denominator * factor + MathFunctions.randomInt(-1, 1)
-        break
-      default:
-        wrongNumerator = MathFunctions.randomInt(1, 5)
-        wrongDenominator = MathFunctions.randomInt(2, 8)
+    if (strategy === 0) n += MathFunctions.randomInt(-3, 3)
+    else if (strategy === 1) d += MathFunctions.randomInt(-2, 2)
+    else if (strategy === 2) { n += MathFunctions.randomInt(-2, 2); d += MathFunctions.randomInt(-1, 1) }
+    else if (strategy === 3) { const f = MathFunctions.randomInt(1, 3); n = n * f + 1; d = d * f - 1 }
+    else { n = MathFunctions.randomInt(1, 5); d = MathFunctions.randomInt(2, 8) }
+
+    const isNegative = (n * d < 0) && constraints.canBeNegative
+    const absN = Math.max(1, Math.abs(n))
+    const absD = Math.max(2, Math.abs(d))
+
+    const fraction = MathFunctions.simplifyFraction(absN, absD)
+    const result = isNegative ? `-${fraction}` : fraction
+
+    if (result !== correctAnswer && !result.includes('NaN') && result !== '0') {
+      return result
     }
-
-    wrongNumerator = Math.max(1, Math.abs(wrongNumerator))
-    wrongDenominator = Math.max(2, Math.abs(wrongDenominator))
-    const simplified = MathFunctions.simplifyFraction(wrongNumerator, wrongDenominator)
-
-    if (simplified !== correctAnswer && simplified !== '0' && !simplified.includes('NaN') &&
-       (constraints.canBeNegative || !simplified.includes('-'))) {
-      return simplified
-    }
-    attempts++
   }
+
   return MathFunctions.simplifyFraction(MathFunctions.randomInt(1, 5), MathFunctions.randomInt(2, 8))
 }

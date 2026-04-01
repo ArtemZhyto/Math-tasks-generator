@@ -15,9 +15,15 @@ export const formatDecimal = (numberStr: string, finalFormat: boolean = false, a
   logger.info('FORMAT', 'Форматування числа:', numberStr, 'finalFormat:', finalFormat, 'addSpace:', addSpace)
 
 	const isStructure = numberStr.includes('=') ||
-                      numberStr.includes(';') ||
-                      numberStr.includes('(') ||
-                      isCompletelyStringResult(numberStr)
+                      numberStr.includes('≠') ||
+                      numberStr.includes('<') ||
+                    	numberStr.includes('>') ||
+											numberStr.includes('≤') ||
+                      numberStr.includes('≥') ||
+                    	numberStr.includes('!') ||
+                    	numberStr.includes(';') ||
+                    	numberStr.includes('(') ||
+                    	isCompletelyStringResult(numberStr)
 
   if (isStructure) {
     logger.info('FORMAT', 'Структурний або строковий результат, повертаємо як є:', numberStr)
