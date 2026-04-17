@@ -1,5 +1,5 @@
 <div align="center">
- <h1>Math Task Generator / Генератор Математичних Завдань</h1>  
+ <h1>Math Task Generator / Генератор Математичних Завдань</h1>
 </div>
 
 <div align="center">
@@ -22,48 +22,48 @@
 
 ---
 
-## Table of Contents / Зміст  
+## Table of Contents / Зміст
 
-### English  
-1. [Project Description](#project-description)  
-2. [Features](#features)  
-3. [How to Use](#how-to-use)  
-4. [Configuration Object](#configuration-object)  
-5. [Supporting the Project](#supporting-the-project)  
+### English
+1. [Project Description](#project-description)
+2. [Features](#features)
+3. [How to Use](#how-to-use)
+4. [Configuration Object](#configuration-object)
+5. [Supporting the Project](#supporting-the-project)
 6. [Supporters Hall of Fame](#💎-supporters-hall-of-fame)
 7. [Created & Maintained by](#author-section)
 
-### Українська  
-1. [Опис проекту](#опис-проекту)  
-2. [Можливості](#можливості)  
-3. [Як використовувати](#як-використовувати)  
-4. [Об’єкт конфігурації](#обєкт-конфігурації)  
-5. [Підтримка проекту](#підтримка-проекту)  
-6. [Зала слави меценатів](#💎-зала-слави-меценатів)  
+### Українська
+1. [Опис проекту](#опис-проекту)
+2. [Можливості](#можливості)
+3. [Як використовувати](#як-використовувати)
+4. [Об’єкт конфігурації](#обєкт-конфігурації)
+5. [Підтримка проекту](#підтримка-проекту)
+6. [Зала слави меценатів](#💎-зала-слави-меценатів)
 7. [Автор та розробник](#author-section-ua)
 
 ---
 
-## Math Task Generator  
+## Math Task Generator
 
-### Project Description  
+### Project Description
 A universal generator of mathematical problems with automatic answer generation. Generates problems for calculating perimeters, arithmetic operations, and more. Includes validation and customizable constraints.
 
-### Features  
-- Generates math tasks with **correct answers**  
-- Supports **variables and constraints**  
-- Auto-generates **multiple-choice options**  
-- Handles **units of measurement** (cm, mm, etc.)  
-- Works with **fractions, integers, and decimals**  
-- Configurable **number ranges** and validation rules  
+### Features
+- Generates math tasks with **correct answers**
+- Supports **variables and constraints**
+- Auto-generates **multiple-choice options**
+- Handles **units of measurement** (cm, mm, etc.)
+- Works with **fractions, integers, and decimals**
+- Configurable **number ranges** and validation rules
 
-### How to Use  
-Pass a config object to `generateTask()`:  
+### How to Use
+Pass a config object to `generateTask()`:
 
 ```javascript
 const config = {
   condition: "Calculate the perimeter of a rectangle with sides @A cm and @B cm",
-  template: "concat(multiply(2, sum(@A, @B)), ' см')",
+  template: "concat(multiply(2, sum(@A, @B)), ' cm')",
   variables: {
     A: { range: [5, 12] },
     B: { range: [8, 15] }
@@ -78,16 +78,16 @@ const config = {
 const task = generateTask(config);
 ```
 
-#### Example Output:  
+#### Example Output:
 ```javascript
 {
   condition: "Calculate the perimeter of a rectangle with sides 7 cm and 10 cm",
-  answers: ["34 см", "17 см", "24 см", "70 см"],
-  correctAnswer: "34 см"
+  answers: ["34 cm", "17 cm", "24 cm", "70 cm"],
+  correctAnswer: "34 cm"
 }
 ```
 
-### Configuration Object  
+### Configuration Object
 | Field         | Type             | Description                                                                 |
 |---------------|------------------|-----------------------------------------------------------------------------|
 | `condition`   | string           | Problem text with variables (e.g., `@A`, `@B`)                              |
@@ -95,13 +95,13 @@ const task = generateTask(config);
 | `variables`   | Object           | Range/value definitions for variables (`range: [min,max]` or `values: [...]`). |
 | `constraints` | Object           | Rules for answers (`minResult`, `maxResult`, `integerResult`, etc.).        |
 
-#### Supported Functions  
-- Arithmetic: `sum`, `multiply`, `minus`, `divide`, `modulus`  
-- Fractions: `fraction`, `fractionAdd`, `toDecimal`  
-- Comparisons: `greater`, `less`, `equal`  
-- Utilities: `concat`, `round`, `sqrt`  
+#### Supported Functions
+- Arithmetic: `sum`, `multiply`, `minus`, `divide`, `modulus`
+- Fractions: `fraction`, `fractionAdd`, `toDecimal`
+- Comparisons: `greater`, `less`, `equal`
+- Utilities: `concat`, `round`, `sqrt`
 
-Full list: [`math-functions.ts`](#math-functions-library).  
+Full list: [`math-functions.ts`](#math-functions-library).
 
 ## Supporting the Project
 
@@ -142,27 +142,27 @@ _Your support helps improve and maintain this generator!_
 
 ---
 
-*Empowering educators worldwide*  
+*Empowering educators worldwide*
 
 </div>
 
 ---
 
-## Генератор Математичних Завдань  
+## Генератор Математичних Завдань
 
-### Опис проекту  
-Універсальний генератор математичних задач із автоматичним підбором відповідей. Генерує завдання на обчислення периметрів, арифметичні дії тощо. Має вбудовану перевірку обмежень.  
+### Опис проекту
+Універсальний генератор математичних задач із автоматичним підбором відповідей. Генерує завдання на обчислення периметрів, арифметичні дії тощо. Має вбудовану перевірку обмежень.
 
-### Можливості  
-- Генерує задачі з **правильними відповідями**  
-- Підтримує **змінні та обмеження**  
-- Автоматично створює **варіанти вибору**  
-- Працює з **одиницями виміру** (см, мм, грн)  
-- Обробляє **дроби, цілі та десяткові числа**  
-- Налаштовувані **діапазони чисел**  
+### Можливості
+- Генерує задачі з **правильними відповідями**
+- Підтримує **змінні та обмеження**
+- Автоматично створює **варіанти вибору**
+- Працює з **одиницями виміру** (см, мм, грн)
+- Обробляє **дроби, цілі та десяткові числа**
+- Налаштовувані **діапазони чисел**
 
-### Як використовувати  
-Передайте об’єкт конфігурації у `generateTask()`:  
+### Як використовувати
+Передайте об’єкт конфігурації у `generateTask()`:
 
 ```javascript
 const config = {
@@ -182,7 +182,7 @@ const config = {
 const task = generateTask(config);
 ```
 
-#### Приклад результату:  
+#### Приклад результату:
 ```javascript
 {
   condition: "Обчисліть периметр прямокутника зі сторонами 7 см і 10 см",
@@ -191,7 +191,7 @@ const task = generateTask(config);
 }
 ```
 
-### Об’єкт конфігурації  
+### Об’єкт конфігурації
 | Поле          | Тип              | Опис                                                                        |
 |---------------|------------------|-----------------------------------------------------------------------------|
 | `condition`   | string           | Текст задачі із змінними (напр., `@A`, `@B`).                               |
@@ -199,13 +199,13 @@ const task = generateTask(config);
 | `variables`   | Object           | Діапазони/значення змінних (`range: [min,max]` або `values: [...]`).        |
 | `constraints` | Object           | Обмеження (`minResult`, `maxResult`, `integerResult` тощо).                 |
 
-#### Підтримувані функції  
-- Арифметика: `sum`, `multiply`, `minus`, `divide`, `modulus`  
-- Дроби: `fraction`, `fractionAdd`, `toDecimal`  
-- Порівняння: `greater`, `less`, `equal`  
-- Додатково: `concat`, `round`, `sqrt`  
+#### Підтримувані функції
+- Арифметика: `sum`, `multiply`, `minus`, `divide`, `modulus`
+- Дроби: `fraction`, `fractionAdd`, `toDecimal`
+- Порівняння: `greater`, `less`, `equal`
+- Додатково: `concat`, `round`, `sqrt`
 
-Повний список: [`math-functions.ts`](#бібліотека-математичних-функцій).  
+Повний список: [`math-functions.ts`](#бібліотека-математичних-функцій).
 
 ### Підтримка проекту
 Якщо цей генератор корисний у вашій роботі чи навчанні, ви можете підтримати його розвиток:
