@@ -76,7 +76,8 @@ const executeMathFunction = (func: string, args: any[]): string => {
     case 'pow': return MathFunctions.pow(Number(args[0]), Number(args[1])).toString()
     case 'sqrt': return MathFunctions.sqrt(Number(args[0])).toString()
     case 'root': return MathFunctions.root(Number(args[0]), Number(args[1])).toString()
-    case 'round': return handleRound(args)
+		case 'fact': return MathFunctions.fact(Number(args[0])).toString()
+		case 'round': return handleRound(args)
 
     //C: Функції порівняння з умовним поверненням
     //C: Comparison functions with conditional return

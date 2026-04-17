@@ -43,6 +43,20 @@ const MathFunctions = {
   sqrt: (a: number): number => Math.sqrt(a),
   root: (n: number, a: number): number => Math.pow(a, 1/n),
 
+	fact: (n: number): number => {
+    if (n < 0) throw new Error('Factorial of negative number is not allowed')
+
+    if (n === 0 || n === 1) return 1
+
+		let result = 1
+
+    for (let i = 2; i <= n; i++) {
+      result *= i
+    }
+
+    return result
+  },
+
   round: (a: number, precision: number = 1000): number => {
     return Math.round(a * precision) / precision
   },

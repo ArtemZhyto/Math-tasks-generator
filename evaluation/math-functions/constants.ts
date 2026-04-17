@@ -6,5 +6,5 @@ export const ALL_FUNCTIONS = [
   'max', 'min', 'fraction', 'fractionAdd', 'fractionSubtract',
   'fractionMultiply', 'fractionDivide', 'numerator', 'denominator',
   'gcd', 'lcm', 'toDecimal', 'toFraction', 'round', 'concat',
-  'sin', 'cos', 'tg', 'ctg', 'asin', 'acos', 'atan'
+  'sin', 'cos', 'tg', 'ctg', 'asin', 'acos', 'atan', 'fact'
 ]
